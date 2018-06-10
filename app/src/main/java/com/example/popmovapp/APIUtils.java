@@ -69,7 +69,7 @@ public class APIUtils {
     //The actual download function
     private static String getList(String urlString) throws IOException{
 
-        //create URL
+        //check urlString form
         URL url = null;
         try {
             url = new URL(urlString);
@@ -77,11 +77,11 @@ public class APIUtils {
             e.printStackTrace();
         }
 
-        //get String Response
+        //get String Response:
+        //Create & Open HTTP connection
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
             InputStream inputStream = urlConnection.getInputStream();
-
             Scanner scanner = new Scanner(inputStream);
             scanner.useDelimiter("\\A");
 
@@ -94,6 +94,7 @@ public class APIUtils {
                 return null;
             }
         } finally {
+            //Once complete or failed disconnect
             urlConnection.disconnect();
         }
 

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
     implements MovieListAdapter.MovieClickListener
 {
+    private static final String MOVIE_LIST_IN_BUNDLE = "movie_list";
     private ArrayList<MovieEntry> mData;
     public static String BUNDLE_STRING_KEY = "MovieToDisplay";
     private static String TAG = "MainActivity";
@@ -95,13 +96,14 @@ public class MainActivity extends AppCompatActivity
                           .getString(getResources().getString(R.string.order_key),
                                      getResources().getString(R.string.order_default))) ;
         RefreshData task = new RefreshData();
-        AsyncTaskParms asyncTaskParms = new AsyncTaskParms(sort_by, PAGES_LOADED++);
+        AsyncTaskParms asyncTaskParms = new AsyncTaskParms(sort_by, PAGES_LOADED);
         task.execute(asyncTaskParms);
+        PAGES_LOADED++;
 
 
 
     }
-        /*
+    /* For testing
     private ArrayList<MovieEntry> getSigleDatum() {
         ArrayList<MovieEntry> datum = new ArrayList<>();
         datum.add(
@@ -180,4 +182,6 @@ public class MainActivity extends AppCompatActivity
             mPageToLoad = PageToLoad;
         }
     }
+
+
 }
