@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">PopMovApp</string>
+    <string name="title_activity_details_movie">details_movie</string>
+
+    <string-array name="order_pref_entries">
+        <item>Popularity</item>
+        <item>Date of Release</item>
+        <item>Top Rated</item>
+    </string-array>
+
+    <string-array name="order_pref_values">
+        <item>SORT_BY_POPULARITY</item>
+        <item>SORT_BY_RELEASE_DATE</item>
+        <item>SORT_BY_TOP_RATED</item>
+    </string-array>
+
+    <string name="order_key">ORDER</string>
+    <string name="order_label">Order Movies By</string>
+    <string name="order_default">SORT_BY_POPULARITY</string>
+    <string name="title_activity_Settings">Settings</string>
+
+</resources>
