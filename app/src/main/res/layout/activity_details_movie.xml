@@ -20,6 +20,13 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_details_movie" />
+    <android.support.v7.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <include layout="@layout/content_details_movie" />
+
+        <include layout="@layout/content_details_extras"/>
+    </android.support.v7.widget.LinearLayoutCompat>
 
 </android.support.design.widget.CoordinatorLayout>

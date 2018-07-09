@@ -20,6 +20,9 @@ public class APIUtils {
     private static String API_KEY = UnshareableKeys.API_KEY;
     private static String API_QUERY = "api_key";
     private static String AUTHORITY = "api.themoviedb.org";
+    private static String UTUBE_AUTHORITY= "youtube.com";
+    private static String UTUBE_WATCH = "watch";
+    private static String UTUBE_VIDOE = "v";
     private static String SCHEME = "https";
     private static String QUERY_TYPE[] = {"movie", "discover",  "movie"};
     private static String QUERY_FILTER[] ={"popular", "movie", "top_rated"};
@@ -37,7 +40,12 @@ public class APIUtils {
     private static String PAGE_QUERY = "page";
     private static String PAGE = "1";
     private static String RELEASE_DATE_FILTER = "primary_release_date.lte";
+    private static String MOVIE = "movie";
+    private static String VIDEO = "video";
+    private static String REVIEW = "review";
 
+    public static String LINK_TYPE_VIDEO = "videos";
+    public static String LINK_TYPE_REVIEWS = "reviews";
 
     public enum SORT_BY
     {
@@ -54,7 +62,7 @@ public class APIUtils {
         String URL = downloadListString(pageToLoad, sort_by);
 
         //Download the data
-        response = getList(URL);
+        response = getResult(URL);
 
 
         //parse the data
@@ -66,8 +74,9 @@ public class APIUtils {
         return list;
     }
 
+
     //The actual download function
-    private static String getList(String urlString) throws IOException{
+    private static String getResult(String urlString) throws IOException{
 
         //check urlString form
         URL url = null;
@@ -81,6 +90,7 @@ public class APIUtils {
         //Create & Open HTTP connection
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
+            //TODO: Stoped here. Network on main thread. Should be initiated on click and on a new thread;
             InputStream inputStream = urlConnection.getInputStream();
             Scanner scanner = new Scanner(inputStream);
             scanner.useDelimiter("\\A");
@@ -100,6 +110,7 @@ public class APIUtils {
 
 
     }
+
 
     //Creates the URL to download the data based on the page to download
     // and the sort by option
@@ -176,5 +187,69 @@ public class APIUtils {
 
         return list;
 
+    }
+
+    public static String videoURLFromID (int movieID) throws IOException, JSONException {
+        String result = resolveURLWithType(movieID, VIDEO);
+        JSONObject obj = new JSONObject(result);
+        //parse into MovieEntry
+        String key = obj.getJSONArray("results").getJSONObject(0).getString("key");
+        String site = obj.getJSONArray("results").getJSONObject(0).getString("site");
+
+        if (site.equals("YouTube"))
+            return buildYouTubeURL(key);
+        else
+            return null;
+    }
+    public static String reviewsURLFromID (int movieID) throws IOException, JSONException{
+        String result =  resolveURLWithType(movieID, REVIEW);
+        JSONObject obj = new JSONObject(result);
+        //parse into MovieEntry
+        String key = obj.getJSONArray("results").getJSONObject(0).getString("key");
+        return null;
+    }
+
+    public static String resolveURLWithType (int movieID, String type) throws IOException, JSONException {
+        String URL;
+        String FUNC_NAME = "videoURLFromID";
+        Uri uri = new Uri.Builder().scheme(SCHEME)
+                .authority(AUTHORITY)
+                .appendPath(THREE)
+                .appendPath(MOVIE)
+                .appendPath(String.valueOf(movieID))
+                .appendPath(type)
+                .appendQueryParameter(API_QUERY, API_KEY)
+                .appendQueryParameter(LANGUARE_FILTER_QUERY, LANGUAGE_FILTER)
+                .build();
+
+        URL = uri.toString();
+        Log.i(TAG + FUNC_NAME, ": resolved "+type+" URL: "+URL);
+
+        String result = getResult(URL);
+
+        JSONObject obj = new JSONObject(result);
+        //TODO: add path for reviews
+        if (!obj.has("status_code")) {
+            String key = obj.getJSONArray("results").getJSONObject(0).getString("key");
+            String site = obj.getJSONArray("results").getJSONObject(0).getString("site");
+
+            if (site.equals("YouTube"))
+                return buildYouTubeURL(key);
+            else
+                return null;
+        }
+        else
+            return null;
+
+
+    }
+
+    private static String buildYouTubeURL(String key) {
+        Uri uri = new Uri.Builder().scheme(SCHEME)
+                .authority(UTUBE_AUTHORITY)
+                .appendPath(UTUBE_WATCH)
+                .appendQueryParameter(UTUBE_VIDOE, key)
+                .build();
+        return uri.toString();
     }
 }
