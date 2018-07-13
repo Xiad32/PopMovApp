@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/review_item"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reviewer"
+        android:textSize="15sp"
+        android:id="@+id/ReviewerTV"
+        android:textColor="@color/colorPrimaryDark"
+        android:paddingLeft="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Review"
+        android:textColor="@color/colorPrimary"
+        android:textSize="10sp"
+        android:paddingLeft="8dp"
+        android:id="@+id/ReviewTV" />
+
+</android.support.v7.widget.LinearLayoutCompat>
