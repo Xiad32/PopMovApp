@@ -124,7 +124,7 @@ public class DetailsMovie extends AppCompatActivity {
                 favStar.setVisibility(View.INVISIBLE);
                 notFavStar.setVisibility(View.VISIBLE);
                 favMoviesDBUtils.removeThisFromFavDB(entry);
-                //TODO: remove from favorites
+
             }
         });
 
@@ -133,7 +133,7 @@ public class DetailsMovie extends AppCompatActivity {
             public void onClick(View v) {
                 favStar.setVisibility(View.VISIBLE);
                 notFavStar.setVisibility(View.INVISIBLE);
-                //TODO: add to favorites
+                
                 favMoviesDBUtils.addThisToFavDB(entry);
             }
         });
