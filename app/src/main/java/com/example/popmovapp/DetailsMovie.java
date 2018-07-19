@@ -133,7 +133,7 @@ public class DetailsMovie extends AppCompatActivity {
             public void onClick(View v) {
                 favStar.setVisibility(View.VISIBLE);
                 notFavStar.setVisibility(View.INVISIBLE);
-                
+
                 favMoviesDBUtils.addThisToFavDB(entry);
             }
         });
