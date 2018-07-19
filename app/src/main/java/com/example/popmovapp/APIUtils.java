@@ -250,7 +250,7 @@ public class APIUtils {
                 .appendQueryParameter(API_QUERY, API_KEY)
                 .appendQueryParameter(LANGUARE_FILTER_QUERY, LANGUAGE_FILTER);
         if(type.equals(LINK_TYPE_REVIEWS) )
-            uri = uri.appendQueryParameter(PAGE, "1"); //TODO: add capability to load more
+            uri = uri.appendQueryParameter(PAGE, "1");
 
         URL = uri.build().toString();
         Log.i(TAG + FUNC_NAME, ": resolved "+type+" URL: "+URL);
