@@ -9,13 +9,35 @@
     tools:showIn="@layout/activity_details_movie"
     android:layout_weight="9"
     >
-
     <ImageView
         android:id="@+id/details_thumbnail"
         android:layout_width="149dp"
         android:layout_height="200dp"
+        app:layout_constraintEnd_toEndOf="@id/details_favStar"
+        app:layout_constraintTop_toBottomOf="@id/details_favStar" />
+
+    <ImageView
+        android:id="@+id/details_favStar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:padding="16dp"
+        android:src="@drawable/fullicon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/details_notFavStar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:padding="16dp"
+        android:src="@drawable/emptystar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/details_title_label"

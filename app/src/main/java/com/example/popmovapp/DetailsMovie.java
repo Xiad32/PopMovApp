@@ -1,11 +1,14 @@
 package com.example.popmovapp;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,22 +34,37 @@ import java.util.Date;
 public class DetailsMovie extends AppCompatActivity {
 
     private static final String TAG = "DetailsMovie";
+    public static final String REVIEWS_LINK = "link_to_reviews" ;
+    public static final String MOVIE_NAME = "movie_name";
     private static Intent launcherIntent = null;
+    private static String movie_name;
+    private static SQLiteDatabase database;
+    private static FavMoviesDbHelper favMoviesDbHelper;
+    private static FavMoviesDBUtils favMoviesDBUtils;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details_movie);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
         ImageView thumbnailIV = (ImageView) findViewById(R.id.details_thumbnail);
         TextView  movieTitleTV = (TextView) findViewById(R.id.details_title);
         TextView  movieDateTV = (TextView) findViewById(R.id.details_release);
         TextView  movieRatingsTV = (TextView) findViewById(R.id.details_ratings);
         TextView  moviePlotTV  = (TextView) findViewById(R.id.details_plot);
+        final ImageView favStar = (ImageView) findViewById(R.id.details_favStar);
+        final ImageView notFavStar = (ImageView) findViewById(R.id.details_notFavStar);
         LinearLayoutCompat trailer = (LinearLayoutCompat) findViewById(R.id.trailerView);
         LinearLayoutCompat reviews = (LinearLayoutCompat) findViewById(R.id.reviewsView);
+
+        favMoviesDbHelper = new FavMoviesDbHelper(this);
+        database = favMoviesDbHelper.getWritableDatabase();
+
+        favMoviesDBUtils = new FavMoviesDBUtils(database);
+
 
 
         Intent callingIntent = getIntent();
@@ -57,20 +75,27 @@ public class DetailsMovie extends AppCompatActivity {
 
         SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat display  = new SimpleDateFormat("EEE, MMM d, yyyy");
-        getSupportActionBar().setTitle(entry.getTitle());
+//        getSupportActionBar().setTitle(entry.getTitle());
         movieTitleTV.setText(entry.getTitle());
         movieDateTV.setText(
                 display.format(
                         input.parse(entry.getRelease(), new ParsePosition(0))
                 )
         );
+        movie_name = entry.getTitle();
         moviePlotTV.setText(entry.getPlot());
         movieRatingsTV.setText(String.valueOf(entry.getRatings()));
         Picasso.get()
                 .load(APIUtils.resolveImageURL(entry.getPosterURL()))
                 .into(thumbnailIV);
-
-
+        if(entry.isFavorite()) {
+            favStar.setVisibility(View.VISIBLE);
+            notFavStar.setVisibility(View.INVISIBLE);
+        }
+        else{
+            favStar.setVisibility(View.INVISIBLE);
+            notFavStar.setVisibility(View.VISIBLE);
+        }
 
 
         trailer.setOnClickListener(new View.OnClickListener() {
@@ -93,23 +118,51 @@ public class DetailsMovie extends AppCompatActivity {
             }
         });
 
+        favStar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                favStar.setVisibility(View.INVISIBLE);
+                notFavStar.setVisibility(View.VISIBLE);
+                favMoviesDBUtils.removeThisFromFavDB(entry);
+                //TODO: remove from favorites
+            }
+        });
+
+        notFavStar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                favStar.setVisibility(View.VISIBLE);
+                notFavStar.setVisibility(View.INVISIBLE);
+                //TODO: add to favorites
+                favMoviesDBUtils.addThisToFavDB(entry);
+            }
+        });
+
     }
 
 
-    private static Intent buildIntentFor(String type, int movieID){
+    private static Intent buildIntentFor(Context context, String type, int movieID) {
         Uri webpage = null;
         try {
-                webpage = Uri.parse(APIUtils.resolveURLWithType(movieID, type));
-            } catch (IOException e1) {
+            webpage = Uri.parse(APIUtils.resolveURLWithType(movieID, type));
+        } catch (IOException e1) {
             e1.printStackTrace();
-            } catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
         if (webpage == null)
             return null;
 
-        return new Intent(Intent.ACTION_VIEW, webpage);
+        if (type.equals(APIUtils.LINK_TYPE_VIDEO))
+            return new Intent(Intent.ACTION_VIEW, webpage);
+        else //Type == REVIEW
+        {
+            Intent launchIntent = new Intent(context, ReviewsActivity.class);
+            launchIntent.putExtra(REVIEWS_LINK, webpage.toString());
+            launchIntent.putExtra(MOVIE_NAME, movie_name);
+            return launchIntent;
+        }
     }
 
     //Async thread to download movie details from the internet utilizing the APIUtils
@@ -123,7 +176,7 @@ public class DetailsMovie extends AppCompatActivity {
         @Override
         protected Intent doInBackground(AsyncParms... parms) {
             Log.i(TAG, "doInBackground: " + "STarted Async Task GetLink");
-            Intent intent = buildIntentFor(parms[0].type, parms[0].id);
+            Intent intent = buildIntentFor(getApplicationContext(), parms[0].type, parms[0].id);
             return intent;
         }
 
@@ -151,5 +204,6 @@ public class DetailsMovie extends AppCompatActivity {
             type = mType;
         }
     }
+
 
 }

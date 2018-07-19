@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,6 +25,7 @@ public class ReviewsActivity extends AppCompatActivity {
     private static final String TAG = "ReviewsActivity";
     private ArrayList<ContentValues>  mData;
     private ReviewsListAdapter mAdapter;
+    private static RecyclerView reviewView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,9 @@ public class ReviewsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        final RecyclerView reviewView = (RecyclerView) findViewById(R.id.reviewRV);
+        reviewView.setLayoutManager(new LinearLayoutManager(this));
+
         Intent callerIntent = getIntent();
 
         String title = callerIntent.getStringExtra(DetailsMovie.MOVIE_NAME);
@@ -39,8 +44,8 @@ public class ReviewsActivity extends AppCompatActivity {
 
         String reviews_link = callerIntent.getStringExtra(DetailsMovie.REVIEWS_LINK);
 
-        mAdapter = new ReviewsListAdapter(this, mData);
-        final RecyclerView reviewView = (RecyclerView) findViewById(R.id.reviewRV);
+        mData = new ArrayList<ContentValues>();
+        mAdapter = new ReviewsListAdapter(getApplicationContext(), mData);
         reviewView.setAdapter(mAdapter);
 
         GetReviews getReviews = new GetReviews();
@@ -83,7 +88,6 @@ public class ReviewsActivity extends AppCompatActivity {
             else
                 mData.addAll(results);
             mAdapter.updateData(mData);
-            mAdapter.notifyDataSetChanged();
 
             Log.i(TAG, "onPostExecute: " + "Completed internet data transaction");
         }

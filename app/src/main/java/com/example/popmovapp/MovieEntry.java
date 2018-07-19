@@ -13,6 +13,7 @@ class MovieEntry {
     private String mPlot;
     private float mRatings;
     private String mRelease;
+    private boolean mIsFavorite;
 
     private static final String ID_KEY = "ID";
     private static final String POSTER_KEY = "POSTER";
@@ -20,6 +21,7 @@ class MovieEntry {
     private static final String PLOT_KEY = "PLOT";
     private static final String RATINGS_KEY = "RATINGS";
     private static final String RELEASE_KEY = "RELEASE";
+    private static final String IS_FAVORITE_KEY = "ISFAVORITE";
 
     public MovieEntry(int ID, String PosterURL, String Title, String Plot, float Ratings,
                       String Release) {
@@ -29,6 +31,7 @@ class MovieEntry {
         mPlot = Plot;
         mRatings = Ratings;
         mRelease = Release;
+        mIsFavorite = false;
 
     }
     public MovieEntry (ContentValues CV){
@@ -38,6 +41,7 @@ class MovieEntry {
         mPlot = (String ) CV.get(PLOT_KEY);
         mRatings = (float) CV.get(RATINGS_KEY);
         mRelease = (String) CV.get(RELEASE_KEY);
+        mIsFavorite = (Boolean) CV.get(IS_FAVORITE_KEY);
     }
 
     public int getID() {
@@ -96,6 +100,15 @@ class MovieEntry {
         CV.put(PLOT_KEY, mPlot);
         CV.put(RATINGS_KEY,mRatings);
         CV.put(RELEASE_KEY, mRelease);
+        CV.put(IS_FAVORITE_KEY, mIsFavorite);
         return CV;
+    }
+
+    public boolean isFavorite() {
+        return mIsFavorite;
+    }
+
+    public void setIsFavorite(boolean favorite){
+        mIsFavorite = favorite;
     }
 }

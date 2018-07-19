@@ -76,7 +76,7 @@ class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.MovieViewHo
 
     public void updateData(ArrayList<MovieEntry> newData){
         mData = newData;
-        return;
+        this.notifyDataSetChanged();
     }
 
     @Override

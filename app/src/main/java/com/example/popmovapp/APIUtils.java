@@ -1,5 +1,7 @@
 package com.example.popmovapp;
 
+import android.content.ContentValues;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
@@ -46,6 +48,34 @@ public class APIUtils {
 
     public static String LINK_TYPE_VIDEO = "videos";
     public static String LINK_TYPE_REVIEWS = "reviews";
+    public static final String REVIEWER_KEY = "cv_reviewer" ;
+    public static final String REVIEW_KEY = "cv_review" ;
+
+    public static ArrayList<ContentValues> getReviewsFromLink(String URL) throws JSONException, IOException {
+        String review;
+        String reviewer;
+        ArrayList<ContentValues> results = new ArrayList<ContentValues>();
+
+        String result = getResult(URL);
+        JSONObject obj = new JSONObject(result);
+
+        if (obj.has("status_code"))
+            return null;    //Error code
+
+        int count = obj.getJSONArray("results").length();
+        for (int i = 0; i< count; i++) {
+            reviewer = obj.getJSONArray("results").getJSONObject(i).getString("author");
+            review = obj.getJSONArray("results").getJSONObject(i).getString("content");
+            ContentValues thisOne = new ContentValues();
+            thisOne.put(REVIEWER_KEY, reviewer);
+            thisOne.put(REVIEW_KEY  , review);
+            results.add(thisOne);
+
+        }
+
+        return results;
+
+    }
 
     public enum SORT_BY
     {
@@ -90,7 +120,6 @@ public class APIUtils {
         //Create & Open HTTP connection
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
-            //TODO: Stoped here. Network on main thread. Should be initiated on click and on a new thread;
             InputStream inputStream = urlConnection.getInputStream();
             Scanner scanner = new Scanner(inputStream);
             scanner.useDelimiter("\\A");
@@ -212,35 +241,37 @@ public class APIUtils {
     public static String resolveURLWithType (int movieID, String type) throws IOException, JSONException {
         String URL;
         String FUNC_NAME = "videoURLFromID";
-        Uri uri = new Uri.Builder().scheme(SCHEME)
+        Uri.Builder uri = new Uri.Builder().scheme(SCHEME)
                 .authority(AUTHORITY)
                 .appendPath(THREE)
                 .appendPath(MOVIE)
                 .appendPath(String.valueOf(movieID))
                 .appendPath(type)
                 .appendQueryParameter(API_QUERY, API_KEY)
-                .appendQueryParameter(LANGUARE_FILTER_QUERY, LANGUAGE_FILTER)
-                .build();
+                .appendQueryParameter(LANGUARE_FILTER_QUERY, LANGUAGE_FILTER);
+        if(type.equals(LINK_TYPE_REVIEWS) )
+            uri = uri.appendQueryParameter(PAGE, "1"); //TODO: add capability to load more
 
-        URL = uri.toString();
+        URL = uri.build().toString();
         Log.i(TAG + FUNC_NAME, ": resolved "+type+" URL: "+URL);
+
+        if(type.equals(LINK_TYPE_REVIEWS))
+            return URL;
 
         String result = getResult(URL);
 
         JSONObject obj = new JSONObject(result);
-        //TODO: add path for reviews
-        if (!obj.has("status_code")) {
-            String key = obj.getJSONArray("results").getJSONObject(0).getString("key");
-            String site = obj.getJSONArray("results").getJSONObject(0).getString("site");
 
-            if (site.equals("YouTube"))
-                return buildYouTubeURL(key);
-            else
-                return null;
-        }
+        if (obj.has("status_code"))
+            return null;    //Error code
+
+        String key = obj.getJSONArray("results").getJSONObject(0).getString("key");
+        String site = obj.getJSONArray("results").getJSONObject(0).getString("site");
+
+        if (site.equals("YouTube"))
+            return buildYouTubeURL(key);
         else
             return null;
-
 
     }
 

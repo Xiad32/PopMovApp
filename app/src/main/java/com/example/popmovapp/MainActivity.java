@@ -3,6 +3,8 @@ package com.example.popmovapp;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.media.FaceDetector;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -36,19 +38,24 @@ public class MainActivity extends AppCompatActivity
     private static int NUMBER_OF_COLUMNS = 3;
     private static int PAGES_LOADED = 1;
     private MovieListAdapter mAdapter;
-    APIUtils.SORT_BY sort_by;
-    ProgressBar progressBar;
+    private FavMoviesDbHelper favMoviesDbHelper;
+    private APIUtils.SORT_BY sort_by;
+    private ProgressBar progressBar;
+    private FavMoviesDBUtils favMoviesDBUtils;
+    private SQLiteDatabase database;
 
     @Override
     protected void onResume() {
         super.onResume();
         PAGES_LOADED=1;
         Log.i(TAG, "onResume: "+"Reset Pages to 1.");
+        resetData(favMoviesDBUtils.getAllFavMovies());
     }
 
     @Override
     public void onMovieClick(int position) {
         Intent callDetailsActivity = new Intent(this, DetailsMovie.class);
+        mData.get(position).setIsFavorite(favMoviesDBUtils.isThisMovieAFav(mData.get(position)));
         callDetailsActivity.putExtra(BUNDLE_STRING_KEY, mData.get(position).toCV());
         startActivity(callDetailsActivity);
     }
@@ -71,8 +78,15 @@ public class MainActivity extends AppCompatActivity
 
         mAdapter = new MovieListAdapter(getApplicationContext(), this,
                 mData);
-
         gridView.setAdapter(mAdapter);
+
+        favMoviesDbHelper = new FavMoviesDbHelper(this);
+        database = favMoviesDbHelper.getWritableDatabase();
+
+        favMoviesDBUtils = new FavMoviesDBUtils(database);
+
+        resetData(favMoviesDBUtils.getAllFavMovies());
+
 
 
         //Get move movie details if scrolled all the way to the end of the list
@@ -102,6 +116,14 @@ public class MainActivity extends AppCompatActivity
 
 
 
+    }
+
+    private void resetData(ArrayList<MovieEntry> allFavMovies) {
+        if (mData == null)
+            mData = allFavMovies;
+        else
+            mData.addAll(allFavMovies);
+        mAdapter.updateData(mData);
     }
     /* For testing
     private ArrayList<MovieEntry> getSigleDatum() {
@@ -144,16 +166,13 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(ArrayList<MovieEntry> movieEntries) {
             super.onPostExecute(movieEntries);
             //Hide the progress bar and update the recyclerview
-            if (mData == null)
-                mData = movieEntries;
-            else
-                mData.addAll(movieEntries);
-            mAdapter.updateData(mData);
-            mAdapter.notifyDataSetChanged();
+            resetData(movieEntries);
             progressBar.setVisibility(View.INVISIBLE);
 
             Log.i(TAG, "onPostExecute: " + "Completed internet data transaction");
+
         }
+
     }
 
     @Override
@@ -182,6 +201,9 @@ public class MainActivity extends AppCompatActivity
             mPageToLoad = PageToLoad;
         }
     }
+
+
+
 
 
 }

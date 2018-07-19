@@ -18,5 +18,6 @@
     <string name="order_label">Order Movies By</string>
     <string name="order_default">SORT_BY_POPULARITY</string>
     <string name="title_activity_Settings">Settings</string>
+    <string name="title_activity_reviews">ReviewsActivity</string>
 
 </resources>
