@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Reviewer"
-        android:textSize="20sp"
+        android:textSize="@dimen/reviewerTextSize"
         android:id="@+id/ReviewerTV"
         android:textColor="@color/colorPrimaryDark"
         android:paddingLeft="8dp" />
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:text="Review"
         android:textColor="@color/colorPrimary"
-        android:textSize="15sp"
+        android:textSize="@dimen/reviewTextSize"
         android:paddingLeft="8dp"
         android:id="@+id/ReviewTV" />
 

@@ -46,6 +46,7 @@ public class APIUtils {
     private static String VIDEO = "video";
     private static String REVIEW = "review";
 
+    public static String TRAILER_URL_KEY = "trailer_url";
     public static String LINK_TYPE_VIDEO = "videos";
     public static String LINK_TYPE_REVIEWS = "reviews";
     public static final String REVIEWER_KEY = "cv_reviewer" ;
@@ -77,11 +78,42 @@ public class APIUtils {
 
     }
 
+    public static ArrayList<ContentValues> getTrailersFromLink(String URL) throws IOException, JSONException {
+        final String SUPPORTED_SITE = "YouTube";
+        String trailerLink;
+        //String reviewer;
+        ArrayList<ContentValues> results = new ArrayList<ContentValues>();
+
+        String result = getResult(URL);
+        JSONObject obj = new JSONObject(result);
+
+        if (obj.has("status_code"))
+            return null;    //Error code
+
+        int count = obj.getJSONArray("results").length();
+        for (int i = 0; i< count; i++) {
+            trailerLink = obj.getJSONArray("results").getJSONObject(i).getString("key");
+            if (SUPPORTED_SITE.equals(
+                    obj.getJSONArray("results").getJSONObject(i).getString("site") )
+                    ) {
+                trailerLink = buildYouTubeURL(trailerLink);
+            }
+            else
+                trailerLink = "Unsupported";
+            ContentValues thisOne = new ContentValues();
+            thisOne.put(TRAILER_URL_KEY, trailerLink);
+            results.add(thisOne);
+        }
+
+        return results;
+    }
+
     public enum SORT_BY
     {
         SORT_BY_POPULARITY,
         SORT_BY_RELEASE_DATE,
         SORT_BY_TOP_RATED,
+        SORT_BY_FAVORITES,
     }
 
     public static ArrayList<MovieEntry> getMoviesFromServer(int pageToLoad, SORT_BY sort_by) throws IOException, JSONException {
@@ -255,9 +287,9 @@ public class APIUtils {
         URL = uri.build().toString();
         Log.i(TAG + FUNC_NAME, ": resolved "+type+" URL: "+URL);
 
-        if(type.equals(LINK_TYPE_REVIEWS))
+        //if(type.equals(LINK_TYPE_REVIEWS))
             return URL;
-
+        /*
         String result = getResult(URL);
 
         JSONObject obj = new JSONObject(result);
@@ -272,6 +304,7 @@ public class APIUtils {
             return buildYouTubeURL(key);
         else
             return null;
+            */
 
     }
 

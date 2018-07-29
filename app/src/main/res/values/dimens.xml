@@ -1,3 +1,7 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+
+    <!--Review Item Dimens-->
+    <dimen name="reviewerTextSize">20sp</dimen>
+    <dimen name="reviewTextSize">15sp</dimen>
 </resources>

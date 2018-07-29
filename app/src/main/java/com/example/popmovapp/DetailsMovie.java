@@ -35,6 +35,7 @@ public class DetailsMovie extends AppCompatActivity {
 
     private static final String TAG = "DetailsMovie";
     public static final String REVIEWS_LINK = "link_to_reviews" ;
+    public static final String TRAILERS_LINK = "link_to_trailers" ;
     public static final String MOVIE_NAME = "movie_name";
     private static Intent launcherIntent = null;
     private static String movie_name;
@@ -63,7 +64,7 @@ public class DetailsMovie extends AppCompatActivity {
         favMoviesDbHelper = new FavMoviesDbHelper(this);
         database = favMoviesDbHelper.getWritableDatabase();
 
-        favMoviesDBUtils = new FavMoviesDBUtils(database);
+        favMoviesDBUtils = new FavMoviesDBUtils(this);
 
 
 
@@ -121,9 +122,11 @@ public class DetailsMovie extends AppCompatActivity {
         favStar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                favStar.setVisibility(View.INVISIBLE);
-                notFavStar.setVisibility(View.VISIBLE);
-                favMoviesDBUtils.removeThisFromFavDB(entry);
+                if (favMoviesDBUtils.removeThisFromFavDB(entry)){
+                    favStar.setVisibility(View.INVISIBLE);
+                    notFavStar.setVisibility(View.VISIBLE);
+
+                }
 
             }
         });
@@ -131,10 +134,11 @@ public class DetailsMovie extends AppCompatActivity {
         notFavStar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                favStar.setVisibility(View.VISIBLE);
-                notFavStar.setVisibility(View.INVISIBLE);
 
-                favMoviesDBUtils.addThisToFavDB(entry);
+                if(favMoviesDBUtils.addThisToFavDB(entry)){
+                    favStar.setVisibility(View.VISIBLE);
+                    notFavStar.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
@@ -155,7 +159,13 @@ public class DetailsMovie extends AppCompatActivity {
             return null;
 
         if (type.equals(APIUtils.LINK_TYPE_VIDEO))
-            return new Intent(Intent.ACTION_VIEW, webpage);
+            //return new Intent(Intent.ACTION_VIEW, webpage);
+        {
+            Intent launchIntent = new Intent(context, TrailersActivity.class);
+            launchIntent.putExtra(TRAILERS_LINK, webpage.toString());
+            launchIntent.putExtra(MOVIE_NAME, movie_name);
+            return launchIntent;
+        }
         else //Type == REVIEW
         {
             Intent launchIntent = new Intent(context, ReviewsActivity.class);

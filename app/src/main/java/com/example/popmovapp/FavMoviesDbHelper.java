@@ -26,7 +26,6 @@ public class FavMoviesDbHelper extends SQLiteOpenHelper {
                 FavMoviesContract.FavlistEntry.COLUMN_RELEASE_KEY + " TEXT NOT NULL" +
                 "); ";
 
-        // COMPLETED (7) Execute the query by calling execSQL on sqLiteDatabase and pass the string query SQL_CREATE_WAITLIST_TABLE
         db.execSQL(SQL_CREATE_FAVOVIES_TABLE);
 
     }

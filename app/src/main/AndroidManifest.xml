@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- <uses-permission android:name="com.example.popmovapp.droidtermsexample.TERMS_READ"/> -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,6 +20,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".DetailsMovie"
@@ -35,7 +37,16 @@
         <activity
             android:name=".ReviewsActivity"
             android:label="@string/title_activity_reviews"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TrailersActivity"
+            android:label="@string/title_activity_trailers"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-    </application>
 
+    <provider
+        android:name="com.example.popmovapp.FavMoviesContentProvider"
+        android:authorities="com.example.popmovapp.favorites"
+        android:exported="false"/>
+
+</application>
 </manifest>

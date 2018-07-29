@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.media.FaceDetector;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
@@ -28,28 +29,43 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static com.example.popmovapp.APIUtils.SORT_BY.SORT_BY_FAVORITES;
+
 public class MainActivity extends AppCompatActivity
     implements MovieListAdapter.MovieClickListener
 {
     private static final String MOVIE_LIST_IN_BUNDLE = "movie_list";
+    private static final String PARCABLE_LIST_KEY = "parcable_state_list";
     private ArrayList<MovieEntry> mData;
     public static String BUNDLE_STRING_KEY = "MovieToDisplay";
     private static String TAG = "MainActivity";
     private static int NUMBER_OF_COLUMNS = 3;
     private static int PAGES_LOADED = 1;
     private MovieListAdapter mAdapter;
-    private FavMoviesDbHelper favMoviesDbHelper;
     private APIUtils.SORT_BY sort_by;
     private ProgressBar progressBar;
     private FavMoviesDBUtils favMoviesDBUtils;
     private SQLiteDatabase database;
+    private GridLayoutManager gridLayoutManager;
+    private Parcelable parcelableList;
 
     @Override
     protected void onResume() {
         super.onResume();
         PAGES_LOADED=1;
         Log.i(TAG, "onResume: "+"Reset Pages to 1.");
-        resetData(favMoviesDBUtils.getAllFavMovies());
+
+        if(parcelableList != null)
+            gridLayoutManager.onRestoreInstanceState(parcelableList);
+
+        if(sort_by == SORT_BY_FAVORITES){
+            mData = favMoviesDBUtils.getAllFavMovies(this);
+            mAdapter.updateData(mData);
+        }
+        else
+            resetData(mData);
+
+
     }
 
     @Override
@@ -74,18 +90,21 @@ public class MainActivity extends AppCompatActivity
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar_loading);
 
-        gridView.setLayoutManager(new GridLayoutManager(this, NUMBER_OF_COLUMNS));
+        gridLayoutManager = new GridLayoutManager(this, NUMBER_OF_COLUMNS);
+
+        gridView.setLayoutManager(gridLayoutManager);
 
         mAdapter = new MovieListAdapter(getApplicationContext(), this,
                 mData);
         gridView.setAdapter(mAdapter);
 
-        favMoviesDbHelper = new FavMoviesDbHelper(this);
-        database = favMoviesDbHelper.getWritableDatabase();
+        //favMoviesDbHelper = new FavMoviesDbHelper(this);
+        //database = favMoviesDbHelper.getWritableDatabase();
 
-        favMoviesDBUtils = new FavMoviesDBUtils(database);
+        favMoviesDBUtils = new FavMoviesDBUtils(this);
 
-        resetData(favMoviesDBUtils.getAllFavMovies());
+        if (sort_by != SORT_BY_FAVORITES)
+            resetData(favMoviesDBUtils.getAllFavMovies(this));
 
 
 
@@ -95,9 +114,11 @@ public class MainActivity extends AppCompatActivity
             public void onScrollChange(View v, int scrollX, int scrollY,
                                        int oldScrollX, int oldScrollY) {
                 if(!gridView.canScrollVertically(1)){
-                    RefreshData task = new RefreshData();
-                    AsyncTaskParms asyncTaskParms = new AsyncTaskParms(sort_by, PAGES_LOADED++);
-                    task.execute(asyncTaskParms);
+                    if (sort_by != SORT_BY_FAVORITES) {
+                        RefreshData task = new RefreshData();
+                        AsyncTaskParms asyncTaskParms = new AsyncTaskParms(sort_by, PAGES_LOADED++);
+                        task.execute(asyncTaskParms);
+                    }
                 }
 
             }
@@ -109,20 +130,28 @@ public class MainActivity extends AppCompatActivity
                 .valueOf(sharedPreferences
                           .getString(getResources().getString(R.string.order_key),
                                      getResources().getString(R.string.order_default))) ;
-        RefreshData task = new RefreshData();
-        AsyncTaskParms asyncTaskParms = new AsyncTaskParms(sort_by, PAGES_LOADED);
-        task.execute(asyncTaskParms);
-        PAGES_LOADED++;
+        if (sort_by != SORT_BY_FAVORITES) {
+            RefreshData task = new RefreshData();
+            AsyncTaskParms asyncTaskParms = new AsyncTaskParms(sort_by, PAGES_LOADED);
+            task.execute(asyncTaskParms);
+            PAGES_LOADED++;
+        }
 
 
 
     }
 
     private void resetData(ArrayList<MovieEntry> allFavMovies) {
-        if (mData == null)
-            mData = allFavMovies;
+        if (mData == null) {
+            if (sort_by == SORT_BY_FAVORITES)
+                mData = allFavMovies;
+            else
+                mData = new ArrayList<MovieEntry>();
+        }
+
         else
-            mData.addAll(allFavMovies);
+            if (sort_by != APIUtils.SORT_BY.SORT_BY_FAVORITES)
+                mData.addAll(allFavMovies);
         mAdapter.updateData(mData);
     }
     /* For testing
@@ -203,7 +232,24 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        //Save List:
+        parcelableList = gridLayoutManager.onSaveInstanceState();
+        outState.putParcelable(PARCABLE_LIST_KEY, parcelableList);
 
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        //Get the list back:
+        if (savedInstanceState != null)
+            parcelableList = savedInstanceState.getParcelable(PARCABLE_LIST_KEY);
+
+    }
 
 }

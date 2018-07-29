@@ -26,12 +26,12 @@ public class FavMoviesCPContract extends FavMoviesContract
             {_ID,   COLUMN_ID,          COLUMN_TITLE_KEY,
                     COLUMN_POSTER_KEY,  COLUMN_RATINGS_KEY,
                     COLUMN_RELEASE_KEY, COLUMN_PLOT_KEY    };
-    public static final int COLUMN_INDEX_ID = 0;
-    public static final int COLUMN_INDEX_TITLE_KEY= 1;
-    public static final int COLUMN_INDEX_POSTER_KEY= 2;
-    public static final int COLUMN_INDEX_RATINGS_KEY= 3;
-    public static final int COLUMN_INDEX_RELEASE_KEY= 4;
-    public static final int COLUMN_INDEX_PLOT_KEY = 5;
+    public static final int COLUMN_INDEX_ID = 1;
+    public static final int COLUMN_INDEX_TITLE_KEY= 2;
+    public static final int COLUMN_INDEX_POSTER_KEY= 3;
+    public static final int COLUMN_INDEX_RATINGS_KEY= 4;
+    public static final int COLUMN_INDEX_RELEASE_KEY= 5;
+    public static final int COLUMN_INDEX_PLOT_KEY = 6;
 
     public static final int DATABASE_VERSION = 1;
 

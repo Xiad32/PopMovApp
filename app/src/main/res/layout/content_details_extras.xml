@@ -27,7 +27,7 @@
             android:layout_weight="9"
             android:textSize="40sp"
             android:layout_gravity="fill_vertical"
-            android:text="Trailer"/>
+            android:text="Trailers"/>
 
 
     </android.support.v7.widget.LinearLayoutCompat>

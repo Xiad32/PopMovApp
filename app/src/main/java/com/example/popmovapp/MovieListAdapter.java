@@ -17,7 +17,7 @@ import java.util.List;
 
 class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.MovieViewHolder>
     implements View.OnClickListener{
-    private int mCount = 0;
+    //private int mCount = 0;
     private Context mContext;
     private ArrayList<MovieEntry> mData;
 
@@ -31,8 +31,8 @@ class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.MovieViewHo
         mContext = context;
         mData = data;
         mMovieClickListener = movieClickListener;
-        if (mData != null)
-            mCount = data.size();
+//        if (mData != null)
+//            mCount = data.size();
     }
 
 //    @Override
