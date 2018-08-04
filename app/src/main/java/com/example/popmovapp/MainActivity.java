@@ -151,7 +151,8 @@ public class MainActivity extends AppCompatActivity
 
         else
             if (sort_by != APIUtils.SORT_BY.SORT_BY_FAVORITES)
-                mData.addAll(allFavMovies);
+                if (allFavMovies != null)
+                    mData.addAll(allFavMovies);
         mAdapter.updateData(mData);
     }
     /* For testing
